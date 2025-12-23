@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Bienvenue sur MaliPress</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body style="background: linear-gradient(135deg, var(--vert) 0%, var(--jaune) 100%); display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0;">
+    <div class="container" style="max-width: 400px; min-height: auto; border-radius: 20px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.2); padding: 40px 20px;">
+        <h1 style="font-size: 2.2em; color: var(--vert); margin-bottom: 10px;">MaliPress ML 🇲🇱</h1>
+        <p style="color: #666; margin-bottom: 30px;">Trouvez un expert de confiance en un clic.</p>
+
+        <div style="display: grid; gap: 15px;">
+            <a href="/espace-client" style="text-decoration: none;">
+                <div style="background: white; padding: 20px; border-radius: 12px; border: 2px solid var(--vert); transition: 0.3s;">
+                    <h2 style="margin: 0; color: var(--vert);">🔍 Client</h2>
+                    <p style="margin: 5px 0 0; color: #444; font-size: 0.9em;">Chercher un prestataire</p>
+                </div>
+            </a>
+
+            <a href="/espace-prestataire" style="text-decoration: none;">
+                <div style="background: var(--vert); padding: 20px; border-radius: 12px; transition: 0.3s;">
+                    <h2 style="margin: 0; color: white;">🛠 Prestataire</h2>
+                    <p style="margin: 5px 0 0; color: #eee; font-size: 0.9em;">Rejoindre le réseau</p>
+                </div>
+            </a>
+        </div>
+    </div>
+    <footer style="margin-top: 50px; text-align: center; border-top: 1px solid #eee; padding-top: 20px;">
+    <a href="/contact" style="color: #666; text-decoration: none; font-size: 0.9em;">❓ Besoin d'aide / Contact</a>
+</footer>
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin MaliPress</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        th { background: #f8f9fa; padding: 10px; text-align: left; }
+        td { padding: 10px; border-bottom: 1px solid #eee; }
+        .badge-gold { background: var(--jaune); padding: 3px 8px; border-radius: 5px; font-weight: bold; font-size: 0.8em; }
+    </style>
+</head>
+<body>
+    <div class="container" style="max-width: 800px;">
+        <h1 style="color: #333; border-bottom: 3px solid var(--jaune);">🛠 Contrôle MaliPress</h1>
+        
+        <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+            <thead>
+                <tr>
+                    <th>Photo</th>
+                    <th>Infos</th>
+                    <th>Statut</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in pros %}
+                <tr>
+                    <td><img src="{{ url_for('static', filename='uploads/' + p.photo) }}" width="45" height="45" style="border-radius: 50%; object-fit: cover;"></td>
+                    <td>
+                        <strong>{{ p.nom }}</strong><br>
+                        <small>{{ p.telephone }}</small>
+                    </td>
+                    <td>
+                        {% if p.statut == 'premium' %}
+                            <span class="badge-gold">PREMIUM</span>
+                        {% else %}
+                            <span style="color: #999;">Gratuit</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if p.statut == 'gratuit' %}
+                            <a href="/valider-pro/{{ p.id }}" style="color: var(--vert); text-decoration: none; font-weight: bold;">✔ Valider</a> | 
+                        {% endif %}
+                        <a href="/supprimer-pro/{{ p.id }}" onclick="return confirm('Supprimer ce compte ?')" style="color: var(--rouge); text-decoration: none;">🗑 Supprimer</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <br><br>
+        <a href="/" style="color: #666;">⬅ Retour Accueil Public</a>
+    </div>
+</body>
+</html>

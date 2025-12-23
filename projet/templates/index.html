@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>MaliPress ML</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header style="text-align: center; border-bottom: 2px solid var(--vert); padding-bottom: 10px; margin-bottom: 20px;">
+            <h1 style="margin: 0;">MaliPress ML 🇲🇱</h1>
+            <a href="/" style="text-decoration: none; color: var(--rouge); font-weight: bold;">🏠 Accueil</a>
+        </header>
+<section style="background: white; padding: 20px; border-radius: 12px; margin-bottom: 25px; border-left: 5px solid var(--vert); box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+    <h2 style="color: var(--vert); margin-top: 0;">Trouvez le bon pro, maintenant.</h2>
+    <p style="color: #555; line-height: 1.5; font-size: 0.95em;">
+        Des milliers de Maliens font confiance à <strong>MaliPress</strong> pour leurs dépannages. 
+        Parcourez les profils, consultez les notes et appelez directement l'expert qu'il vous faut !
+    </p>
+    <div style="display: flex; gap: 15px; margin-top: 10px;">
+        <span style="font-size: 0.8em; background: #f0f0f0; padding: 5px 10px; border-radius: 20px;">🛡 Profils vérifiés</span>
+        <span style="font-size: 0.8em; background: #f0f0f0; padding: 5px 10px; border-radius: 20px;">📞 Appel direct</span>
+    </div>
+</section>
+        {% if role == 'prestataire' %}
+            <div style="background: #fff3cd; padding: 15px; border-radius: 10px; text-align: center; margin-bottom: 20px;">
+                <h3 style="margin: 0;">Places gratuites : {{ places }} / 100</h3>
+                <p style="font-size: 0.8em; color: #856404;"><b>PRO :</b> Payez 2 000 F pour briller et vibrer en haut de liste !</p>
+            </div>
+            <div style="background: #fff3cd; padding: 15px; border-radius: 10px; text-align: center; margin-bottom: 20px;">
+    <h3 style="margin: 0;">Places gratuites : {{ places }} / 100</h3>
+    <p style="font-size: 0.85em; color: #856404;">
+        Boostez vos appels ! 
+        <a href="/conditions-premium" style="color: #000; font-weight: bold; text-decoration: underline;">
+            Voir les avantages du compte Premium (2 000 F)
+        </a>
+    </p>
+</div>
+
+            <form action="/inscription-pro" method="POST" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 10px;">
+                <input type="text" name="nom" placeholder="Nom complet" required style="padding: 12px; border-radius: 8px; border: 1px solid #ddd;">
+                <input type="text" name="service" placeholder="Métier (Plombier, Électricien...)" required style="padding: 12px; border-radius: 8px; border: 1px solid #ddd;">
+                <input type="text" name="ville" placeholder="Ville" required style="padding: 12px; border-radius: 8px; border: 1px solid #ddd;">
+                <input type="tel" name="telephone" placeholder="Téléphone (Orange/Moov)" required style="padding: 12px; border-radius: 8px; border: 1px solid #ddd;">
+                <label style="font-size: 0.9em;">Photo de profil :</label>
+                <input type="file" name="photo" style="font-size: 0.8em;">
+                <button type="submit" style="background: var(--vert); color: white; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">S'inscrire Gratuitement</button>
+            </form>
+
+        {% else %}
+            <div class="pro-list">
+                {% for p in prestataires %}
+                <div class="pro-card {% if p.statut == 'premium' %}premium{% endif %}">
+                    <img src="{{ url_for('static', filename='uploads/' + p.photo) }}" class="pro-photo">
+                    <div class="pro-info">
+                        <h3>{{ p.nom }}</h3>
+                        <span class="service-badge">{{ p.service }}</span>
+                        <p style="margin: 5px 0 0; font-size: 0.8em; color: #666;">📍 {{ p.ville }}</p>
+                    </div>
+                    <div class="actions">
+                        <a href="tel:{{ p.telephone }}" class="btn-call">📞 Appeler</a>
+                        <a href="/discuter/{{ p.nom }}" class="btn-chat">💬 Chat</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+    <footer style="margin-top: 50px; text-align: center; border-top: 1px solid #eee; padding-top: 20px;">
+    <a href="/contact" style="color: #666; text-decoration: none; font-size: 0.9em;">❓ Besoin d'aide / Contact</a>
+</footer>
+</body>
+</html>

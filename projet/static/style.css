@@ -1,0 +1,62 @@
+:root { --vert: #008037; --jaune: #fcd116; --rouge: #ce1126; }
+body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; margin: 0; }
+.container { max-width: 600px; margin: auto; background: white; min-height: 100vh; padding: 20px; }
+
+/* CARTES DES PRESTATAIRES */
+.pro-card {
+    display: flex;
+    align-items: center;
+    background: white;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 15px;
+    border: 1px solid #eee;
+    transition: 0.3s;
+}
+
+/* STYLE UNIQUE POUR LES ABONNÉS PREMIUM */
+.pro-card.premium {
+    background: linear-gradient(145deg, #ffffff, #fffdf0);
+    border: 2px solid var(--jaune);
+    box-shadow: 0 5px 15px rgba(252, 209, 22, 0.3);
+    position: relative;
+}
+
+.pro-card.premium::before {
+    content: "⭐ TOP PRO";
+    position: absolute;
+    top: -10px; right: 10px;
+    background: var(--jaune);
+    font-size: 0.7em; font-weight: bold;
+    padding: 3px 8px; border-radius: 5px;
+}
+
+.pro-photo {
+    width: 70px; height: 70px; border-radius: 50%;
+    object-fit: cover; margin-right: 15px; border: 2px solid #ddd;
+}
+
+.premium .pro-photo { border-color: var(--jaune); }
+
+.pro-info { flex-grow: 1; }
+.pro-info h3 { margin: 0; font-size: 1.1em; }
+.service-badge { background: #e8f5e9; color: var(--vert); padding: 2px 8px; border-radius: 10px; font-size: 0.8em; }
+
+/* BOUTONS */
+.actions { display: flex; flex-direction: column; gap: 5px; }
+.btn-call {
+    background: var(--vert); color: white; text-decoration: none;
+    padding: 8px 12px; border-radius: 8px; text-align: center; font-weight: bold;
+}
+
+/* SEUL LE BOUTON DES PREMIUMS VIBRE */
+.premium .btn-call { animation: shake 2s infinite; }
+
+@keyframes shake {
+    0% { transform: scale(1); }
+    10% { transform: scale(1.1) rotate(2deg); }
+    20% { transform: scale(1.1) rotate(-2deg); }
+    30% { transform: scale(1); }
+}
+
+.btn-chat { background: #333; color: white; text-decoration: none; padding: 8px 12px; border-radius: 8px; text-align: center; font-size: 0.8em; }
