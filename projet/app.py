@@ -68,86 +68,20 @@ def inscription_pro():
     conn.commit()
     conn.close()
     return redirect(url_for('mon_espace'))
+# Ligne 71 de ta photo b8f0a393
 @app.route('/envoyer', methods=['POST'])
 def envoyer():
-    # On vérifie si l'utilisateur est connecté via sa session
+    # On vérifie si l'utilisateur est connecté
     if 'user_id' in session:
         destinataire = request.form.get('destinataire')
         message_contenu = request.form.get('message')
         expediteur = session['user_id']
         
-        # On enregistre le message dans ta base malipress.db
         conn = get_db_connection()
+        # On enregistre le message dans la table que tu as créée
         conn.execute('INSERT INTO messages (expediteur, destinataire, contenu) VALUES (?, ?, ?)',
                      (expediteur, destinataire, message_contenu))
         conn.commit()
         conn.close()
-        
-    # On recharge la page pour voir le message envoyé
-    return redirect(url_for('mon_espace'))
-@app.route('/admin-malipress-2025')
-def admin():
-    conn = get_db_connection()
-    pros = conn.execute('SELECT * FROM prestataires').fetchall()
-    conn.close()
-    return render_template('admin.html', pros=pros)
-
-@app.route('/valider-pro/<int:id>')
-def valider(id):
-    conn = get_db_connection()
-    conn.execute("UPDATE prestataires SET statut = 'premium' WHERE id = ?", (id,))
-    conn.commit()
-    conn.close()
-    return redirect(url_for('admin'))
-
-@app.route('/supprimer-pro/<int:id>')
-def supprimer_pro(id):
-    conn = get_db_connection()
-    conn.execute('DELETE FROM prestataires WHERE id = ?', (id,))
-    conn.commit()
-    conn.close()
-    return redirect(url_for('admin'))
-
-@app.route('/discuter/<nom>')
-def discuter(nom):
-    conn = get_db_connection()
-    pro = conn.execute('SELECT telephone FROM prestataires WHERE nom = ?', (nom,)).fetchone()
-    conn.close()
-    tel = pro['telephone'] if pro else ""
-    return render_template('chat.html', prestataire=nom, telephone=tel)
-@app.route('/contact')
-def contact():
-    return render_template('contact.html')
-@app.route('/conditions-premium')
-def conditions_premium():
-    return render_template('conditions_premium.html')
-    @app.route('/mon-espace')
-def mon_espace():
-    if 'user_id' not in session:
-        return redirect(url_for('home')) # Redirige si non inscrit
     
-    conn = get_db_connection()
-    # Récupère les messages reçus par le prestataire connecté
-    messages = conn.execute('SELECT * FROM messages WHERE destinataire = ?', (session['user_id'],)).fetchall()
-    # Récupère la liste des autres prestataires pour pouvoir leur écrire
-    autres_pros = conn.execute('SELECT * FROM prestataires WHERE nom != ?', (session['user_id'],)).fetchall()
-    conn.close()
-    return render_template('espace_pro.html', messages=messages, pros=autres_pros)
-
-@app.route('/envoyer-message', methods=['POST'])
-def envoyer_message():
-    if 'user_id' in session:
-        destinataire = request.form.get('destinataire')
-        contenu = request.form.get('contenu')
-        expediteur = session['user_id']
-        
-        conn = get_db_connection()
-        conn.execute('INSERT INTO messages (expediteur, destinataire, contenu) VALUES (?, ?, ?)',
-                     (expediteur, destinataire, contenu))
-        conn.commit()
-        conn.close()
     return redirect(url_for('mon_espace'))
-if __name__ == '__main__':
-
-    app.run(debug=True)
-
