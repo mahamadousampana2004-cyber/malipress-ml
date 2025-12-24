@@ -125,6 +125,6 @@ def mon_espace():
     autres = conn.execute('SELECT * FROM prestataires WHERE nom != ?', (session['user_id'],)).fetchall()
     conn.close()
 return render_template('chat.html', messages=messages, prestataires=autres)
-
 if __name__ == '__main__':
     app.run(debug=True)
+
