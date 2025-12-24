@@ -126,8 +126,8 @@ def mon_espace():
     conn.close()
     return render_template('chat.html', messages=messages, prestataires=autres)
 
-# TRÈS IMPORTANT : Ce bloc doit être tout à gauche (pas d'espaces avant)
 if __name__ == '__main__':
     init_db()
     app.run(debug=True)
+
 
