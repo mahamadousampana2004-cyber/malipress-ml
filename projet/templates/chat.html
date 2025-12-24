@@ -7,31 +7,37 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <div class="container">
-        <header style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--vert); padding-bottom: 10px;">
-            <h2 style="margin: 0; font-size: 1.2em;">Chat : {{ prestataire }}</h2>
-            <a href="/espace-client" style="text-decoration: none; color: var(--rouge); font-weight: bold;">Fermer</a>
-        </header>
-
-        <div style="margin: 20px 0; padding: 10px; background: #e8f5e9; border-radius: 8px; font-size: 0.85em; color: var(--vert); text-align: center;">
-             🛡 Pour votre sécurité, ne payez qu'après réalisation du travail.
+   <div class="container">
+    <h2>Espace de {{ session['user_id'] }} 🛠</h2>
+    
+    <h3>📩 Messages reçus</h3>
+    {% for m in messages %}
+        <div style="background: #f4f4f4; padding: 15px; border-radius: 10px; margin-bottom: 10px; border-left: 5px solid #008137;">
+            <strong>De : {{ m['expediteur'] }}</strong>
+            <p>{{ m['contenu'] }}</p>
+            <small style="color: gray;">{{ m['date'] }}</small>
         </div>
+    {% else %}
+        <p>Aucun message pour le moment.</p>
+    {% endfor %}
 
-        <div style="background: #fff; border: 1px solid #eee; border-radius: 10px; height: 350px; padding: 15px; display: flex; flex-direction: column; overflow-y: auto; margin-bottom: 15px;">
-            <div style="background: #f0f0f0; padding: 10px; border-radius: 10px; align-self: flex-start; max-width: 80%; font-size: 0.9em;">
-                Bonjour ! Comment puis-je vous aider pour mon service de <b>{{ prestataire }}</b> ?
-            </div>
-        </div>
+    <hr style="margin: 20px 0;">
 
-        <div style="display: flex; gap: 10px;">
-            <input type="text" placeholder="Écrivez ici..." style="flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 8px;">
-            <button class="btn-call" style="border: none; cursor: pointer; padding: 0 20px;">Envoyer</button>
-        </div>
-        
-        <p style="text-align: center; margin-top: 15px;">
-            <a href="tel:{{ telephone }}" style="color: var(--vert); font-weight: bold; text-decoration: none;">📞 Appeler directement : {{ telephone }}</a>
-        </p>
-    </div>
+    <h3>💬 Envoyer un message à un collègue</h3>
+    <form action="/envoyer" method="POST">
+        <select name="destinataire" style="width:100%; padding:12px; border-radius: 8px; margin-bottom: 10px;">
+            {% for p in prestataires %}
+                <option value="{{ p['nom'] }}">{{ p['nom'] }} ({{ p['service'] }})</option>
+            {% endfor %}
+        </select>
+        <textarea name="message" placeholder="Écrivez votre message ici..." style="width:100%; height:100px; padding: 10px; border-radius: 8px;"></textarea>
+        <button type="submit" style="background: #008137; color: white; width: 100%; padding: 15px; border: none; border-radius: 10px; font-weight: bold; margin-top: 10px;">Envoyer le message</button>
+    </form>
+    
+    <br>
+    <a href="/logout" style="color: red; text-decoration: none;">Se déconnecter</a>
+</div>
 </body>
 
 </html>
+
