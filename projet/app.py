@@ -1,12 +1,10 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 import sqlite3
 import os
-from werkzeug.utils import secure_filename
 
-app = Flask(__name__)
-UPLOAD_FOLDER = 'static/uploads'
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app = Flask(_name_)
 app.secret_key = 'malipress_secret_key_2024'
+
 def get_db_connection():
     conn = sqlite3.connect('malipress.db')
     conn.row_factory = sqlite3.Row
@@ -14,7 +12,8 @@ def get_db_connection():
 
 def init_db():
     conn = get_db_connection()
-   conn.execute('''
+    # Table des prestataires
+    conn.execute('''
         CREATE TABLE IF NOT EXISTS prestataires (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             nom TEXT NOT NULL,
@@ -24,7 +23,9 @@ def init_db():
             photo TEXT DEFAULT 'default.png',
             statut TEXT DEFAULT 'gratuit',
             note REAL DEFAULT 4.5
-        
+        )
+    ''')
+    # Table des messages (Celle qui manquait au début)
     conn.execute('''
         CREATE TABLE IF NOT EXISTS messages (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -37,59 +38,45 @@ def init_db():
     conn.commit()
     conn.close()
 
+# Initialisation au démarrage
 init_db()
 
 @app.route('/')
 def home():
-    return render_template('choix_compte.html')
-
-@app.route('/espace-client')
-def espace_client():
     conn = get_db_connection()
-    # Tri : Les Premium en haut, puis les meilleures notes
-    pros = conn.execute('SELECT * FROM prestataires ORDER BY statut DESC, note DESC').fetchall()
+    prestataires = conn.execute('SELECT * FROM prestataires').fetchall()
     conn.close()
-    return render_template('index.html', role='client', prestataires=pros)
+    return render_template('index.html', prestataires=prestataires)
 
-@app.route('/espace-prestataire')
-def espace_prestataire():
-    conn = get_db_connection()
-    nb = conn.execute('SELECT COUNT(*) FROM prestataires').fetchone()[0]
-    conn.close()
-    return render_template('index.html', role='prestataire', places=(100-nb), inscrit=request.args.get('inscrit'))
-
-@app.route('/inscription-pro', methods=['POST'])
-def inscription_pro():
-    nom = request.form.get('nom')
-    service = request.form.get('service')
-    ville = request.form.get('ville').capitalize()
-    tel = request.form.get('telephone')
-    file = request.files.get('photo')
-    filename = 'default.png'
-    if file and file.filename != '':
-        filename = secure_filename(file.filename)
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+@app.route('/inscription', methods=['POST'])
+def inscription():
+    nom = request.form['nom']
+    service = request.form['service']
+    ville = request.form['ville']
+    tel = request.form['telephone']
     
     conn = get_db_connection()
-    conn.execute('INSERT INTO prestataires (nom, service, ville, telephone, photo) VALUES (?, ?, ?, ?, ?)',
-                 (nom, service, ville, tel, filename))
+    conn.execute('INSERT INTO prestataires (nom, service, ville, telephone) VALUES (?, ?, ?, ?)',
+                 (nom, service, ville, tel))
     conn.commit()
     conn.close()
+    
+    session['user_id'] = nom
     return redirect(url_for('mon_espace'))
+
 @app.route('/mon-espace')
 def mon_espace():
-    # On vérifie si le prestataire est bien connecté
     if 'user_id' not in session:
         return redirect(url_for('home'))
     
     conn = get_db_connection()
-    # On récupère les messages reçus par ce prestataire
-    mes_messages = conn.execute('SELECT * FROM messages WHERE destinataire = ? ORDER BY date DESC', (session['user_id'],)).fetchall()
-    # On récupère la liste des autres prestataires pour pouvoir leur écrire
-    autres = conn.execute('SELECT * FROM prestataires WHERE nom != ?', (session['user_id'],)).fetchall()
+    # On récupère les messages reçus par l'utilisateur connecté
+    mes_messages = conn.execute('SELECT * FROM messages WHERE destinataire = ? ORDER BY date DESC', 
+                                (session['user_id'],)).fetchall()
+    # On récupère les autres prestataires pour la liste de discussion
+    autres = conn.execute('SELECT * FROM prestataires WHERE nom != ?', 
+                          (session['user_id'],)).fetchall()
     conn.close()
-    
-    # On affiche la page chat.html avec les données
     return render_template('chat.html', messages=mes_messages, prestataires=autres)
 
 @app.route('/envoyer', methods=['POST'])
@@ -100,13 +87,11 @@ def envoyer():
         
         if dest and msg:
             conn = get_db_connection()
-            # On enregistre la discussion dans la base malipress.db
             conn.execute('INSERT INTO messages (expediteur, destinataire, contenu) VALUES (?, ?, ?)',
                          (session['user_id'], dest, msg))
             conn.commit()
             conn.close()
             
-    # Après l'envoi, on reste dans l'espace de discussion
     return redirect(url_for('mon_espace'))
 
 @app.route('/logout')
@@ -114,17 +99,6 @@ def logout():
     session.pop('user_id', None)
     return redirect(url_for('home'))
 
-@app.route('/mon-espace')
-def mon_espace():
-    if 'user_id' not in session:
-        return redirect(url_for('home'))
-    
-    conn = get_db_connection()
-    # Correction : on récupère les messages et les autres prestataires
-    messages = conn.execute('SELECT * FROM messages WHERE destinataire = ? ORDER BY date DESC', (session['user_id'],)).fetchall()
-    autres = conn.execute('SELECT * FROM prestataires WHERE nom != ?', (session['user_id'],)).fetchall()
-    conn.close()
-return render_template('chat.html', messages=messages, prestataires=autres)
+# LE BLOC CI-DESSOUS DOIT ÊTRE COLLÉ AU BORD GAUCHE (0 ESPACE)
 if __name__ == '__main__':
     app.run(debug=True)
-
