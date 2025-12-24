@@ -14,7 +14,7 @@ def get_db_connection():
 
 def init_db():
     conn = get_db_connection()
-    conn.execute('''
+   conn.execute('''
         CREATE TABLE IF NOT EXISTS prestataires (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             nom TEXT NOT NULL,
@@ -24,6 +24,16 @@ def init_db():
             photo TEXT DEFAULT 'default.png',
             statut TEXT DEFAULT 'gratuit',
             note REAL DEFAULT 4.5
+        )
+    ''')
+    # AJOUTE CE BLOC ICI
+    conn.execute('''
+        CREATE TABLE IF NOT EXISTS messages (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            expediteur TEXT NOT NULL,
+            destinataire TEXT NOT NULL,
+            contenu TEXT NOT NULL,
+            date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     ''')
     conn.commit()
@@ -106,3 +116,20 @@ def logout():
     # Pour se déconnecter proprement
     session.pop('user_id', None)
     return redirect(url_for('home'))
+@app.route('/mon-espace')
+def mon_espace():
+    # Si l'utilisateur n'est pas connecté, on le renvoie à l'accueil
+    if 'user_id' not in session:
+        return redirect(url_for('home'))
+    
+    conn = get_db_connection()
+    # On récupère les messages pour ce prestataire
+    messages = conn.execute('SELECT * FROM messages WHERE destinataire = ? ORDER BY date DESC', (session['user_id'],)).fetchall()
+    # On récupère les autres pour la liste de discussion
+    autres = conn.execute('SELECT * FROM prestataires WHERE nom != ?', (session['user_id'],)).fetchall()
+    conn.close()
+    
+    return render_template('chat.html', messages=messages, prestataires=autres)
+    if__name__ == '__main__':
+       init_db()
+       app.run(debug=true)
