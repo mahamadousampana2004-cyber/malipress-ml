@@ -24,9 +24,7 @@ def init_db():
             photo TEXT DEFAULT 'default.png',
             statut TEXT DEFAULT 'gratuit',
             note REAL DEFAULT 4.5
-        )
-    ''')
-    # AJOUTE CE BLOC ICI
+        
     conn.execute('''
         CREATE TABLE IF NOT EXISTS messages (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -132,3 +130,4 @@ def mon_espace():
 if __name__ == '__main__':
     init_db()
     app.run(debug=True)
+
