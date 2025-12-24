@@ -1,6 +1,14 @@
 :root { --vert: #008037; --jaune: #fcd116; --rouge: #ce1126; }
 body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; margin: 0; }
-.container { max-width: 600px; margin: auto; background: white; min-height: 100vh; padding: 20px; }
+.container { 
+    width: 90%; 
+    max-width: 400px; 
+    margin: auto; 
+    background: white; 
+    min-height: auto; 
+    padding: 20px; 
+    border-radius: 15px;
+}
 
 /* CARTES DES PRESTATAIRES */
 .pro-card {
@@ -58,5 +66,6 @@ body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; margin: 0; }
     20% { transform: scale(1.1) rotate(-2deg); }
     30% { transform: scale(1); }
 }
+
 
 .btn-chat { background: #333; color: white; text-decoration: none; padding: 8px 12px; border-radius: 8px; text-align: center; font-size: 0.8em; }
