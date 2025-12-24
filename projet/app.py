@@ -68,20 +68,41 @@ def inscription_pro():
     conn.commit()
     conn.close()
     return redirect(url_for('mon_espace'))
-# Ligne 71 de ta photo b8f0a393
+@app.route('/mon-espace')
+def mon_espace():
+    # On vérifie si le prestataire est bien connecté
+    if 'user_id' not in session:
+        return redirect(url_for('home'))
+    
+    conn = get_db_connection()
+    # On récupère les messages reçus par ce prestataire
+    mes_messages = conn.execute('SELECT * FROM messages WHERE destinataire = ? ORDER BY date DESC', (session['user_id'],)).fetchall()
+    # On récupère la liste des autres prestataires pour pouvoir leur écrire
+    autres = conn.execute('SELECT * FROM prestataires WHERE nom != ?', (session['user_id'],)).fetchall()
+    conn.close()
+    
+    # On affiche la page chat.html avec les données
+    return render_template('chat.html', messages=mes_messages, prestataires=autres)
+
 @app.route('/envoyer', methods=['POST'])
 def envoyer():
-    # On vérifie si l'utilisateur est connecté
     if 'user_id' in session:
-        destinataire = request.form.get('destinataire')
-        message_contenu = request.form.get('message')
-        expediteur = session['user_id']
+        dest = request.form.get('destinataire')
+        msg = request.form.get('message')
         
-        conn = get_db_connection()
-        # On enregistre le message dans la table que tu as créée
-        conn.execute('INSERT INTO messages (expediteur, destinataire, contenu) VALUES (?, ?, ?)',
-                     (expediteur, destinataire, message_contenu))
-        conn.commit()
-        conn.close()
-    
+        if dest and msg:
+            conn = get_db_connection()
+            # On enregistre la discussion dans la base malipress.db
+            conn.execute('INSERT INTO messages (expediteur, destinataire, contenu) VALUES (?, ?, ?)',
+                         (session['user_id'], dest, msg))
+            conn.commit()
+            conn.close()
+            
+    # Après l'envoi, on reste dans l'espace de discussion
     return redirect(url_for('mon_espace'))
+
+@app.route('/logout')
+def logout():
+    # Pour se déconnecter proprement
+    session.pop('user_id', None)
+    return redirect(url_for('home'))
