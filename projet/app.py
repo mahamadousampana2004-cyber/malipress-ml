@@ -68,7 +68,23 @@ def inscription_pro():
     conn.commit()
     conn.close()
     return redirect(url_for('mon_espace'))
-
+@app.route('/envoyer', methods=['POST'])
+def envoyer():
+    # On vérifie si l'utilisateur est connecté via sa session
+    if 'user_id' in session:
+        destinataire = request.form.get('destinataire')
+        message_contenu = request.form.get('message')
+        expediteur = session['user_id']
+        
+        # On enregistre le message dans ta base malipress.db
+        conn = get_db_connection()
+        conn.execute('INSERT INTO messages (expediteur, destinataire, contenu) VALUES (?, ?, ?)',
+                     (expediteur, destinataire, message_contenu))
+        conn.commit()
+        conn.close()
+        
+    # On recharge la page pour voir le message envoyé
+    return redirect(url_for('mon_espace'))
 @app.route('/admin-malipress-2025')
 def admin():
     conn = get_db_connection()
@@ -134,3 +150,4 @@ def envoyer_message():
 if __name__ == '__main__':
 
     app.run(debug=True)
+
