@@ -113,23 +113,22 @@ def envoyer():
 
 @app.route('/logout')
 def logout():
-    # Pour se déconnecter proprement
     session.pop('user_id', None)
     return redirect(url_for('home'))
+
 @app.route('/mon-espace')
 def mon_espace():
-    # Si l'utilisateur n'est pas connecté, on le renvoie à l'accueil
     if 'user_id' not in session:
         return redirect(url_for('home'))
     
     conn = get_db_connection()
-    # On récupère les messages pour ce prestataire
+    # Correction : on récupère les messages et les autres prestataires
     messages = conn.execute('SELECT * FROM messages WHERE destinataire = ? ORDER BY date DESC', (session['user_id'],)).fetchall()
-    # On récupère les autres pour la liste de discussion
     autres = conn.execute('SELECT * FROM prestataires WHERE nom != ?', (session['user_id'],)).fetchall()
     conn.close()
-    
     return render_template('chat.html', messages=messages, prestataires=autres)
-    if__name__ == '__main__':
-       init_db()
-       app.run(debug=true)
+
+# TRÈS IMPORTANT : Ce bloc doit être tout à gauche (pas d'espaces avant)
+if __name__ == '__main__':
+    init_db()
+    app.run(debug=True)
