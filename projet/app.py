@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, session
 import sqlite3
 import os
 from werkzeug.utils import secure_filename
@@ -6,7 +6,7 @@ from werkzeug.utils import secure_filename
 app = Flask(__name__)
 UPLOAD_FOLDER = 'static/uploads'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
+app.secret_key = 'malipress_secret_key_2024'
 def get_db_connection():
     conn = sqlite3.connect('malipress.db')
     conn.row_factory = sqlite3.Row
@@ -67,7 +67,7 @@ def inscription_pro():
                  (nom, service, ville, tel, filename))
     conn.commit()
     conn.close()
-    return redirect(url_for('espace_prestataire', inscrit='oui'))
+    return redirect(url_for('mon_espace'))
 
 @app.route('/admin-malipress-2025')
 def admin():
@@ -104,6 +104,33 @@ def contact():
     return render_template('contact.html')
 @app.route('/conditions-premium')
 def conditions_premium():
-    return render_template('conditions_premium.html')    
+    return render_template('conditions_premium.html')
+    @app.route('/mon-espace')
+def mon_espace():
+    if 'user_id' not in session:
+        return redirect(url_for('home')) # Redirige si non inscrit
+    
+    conn = get_db_connection()
+    # Récupère les messages reçus par le prestataire connecté
+    messages = conn.execute('SELECT * FROM messages WHERE destinataire = ?', (session['user_id'],)).fetchall()
+    # Récupère la liste des autres prestataires pour pouvoir leur écrire
+    autres_pros = conn.execute('SELECT * FROM prestataires WHERE nom != ?', (session['user_id'],)).fetchall()
+    conn.close()
+    return render_template('espace_pro.html', messages=messages, pros=autres_pros)
+
+@app.route('/envoyer-message', methods=['POST'])
+def envoyer_message():
+    if 'user_id' in session:
+        destinataire = request.form.get('destinataire')
+        contenu = request.form.get('contenu')
+        expediteur = session['user_id']
+        
+        conn = get_db_connection()
+        conn.execute('INSERT INTO messages (expediteur, destinataire, contenu) VALUES (?, ?, ?)',
+                     (expediteur, destinataire, contenu))
+        conn.commit()
+        conn.close()
+    return redirect(url_for('mon_espace'))
 if __name__ == '__main__':
+
     app.run(debug=True)
