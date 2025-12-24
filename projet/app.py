@@ -101,6 +101,7 @@ def logout():
 
 # LE BLOC CI-DESSOUS DOIT ÊTRE COLLÉ AU BORD GAUCHE (0 ESPACE)
 if __name__ == '__main__':
-app.run(debug=True)
+    app.run(debug=True)
+
 
 
