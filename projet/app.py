@@ -124,10 +124,7 @@ def mon_espace():
     messages = conn.execute('SELECT * FROM messages WHERE destinataire = ? ORDER BY date DESC', (session['user_id'],)).fetchall()
     autres = conn.execute('SELECT * FROM prestataires WHERE nom != ?', (session['user_id'],)).fetchall()
     conn.close()
-    return render_template('chat.html', messages=messages, prestataires=autres)
+return render_template('chat.html', messages=messages, prestataires=autres)
 
 if __name__ == '__main__':
-    init_db()
     app.run(debug=True)
-
-
