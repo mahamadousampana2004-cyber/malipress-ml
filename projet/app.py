@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, session
 import sqlite3
 import os
 
-app = Flask(_name_)
+app = Flask(__name__)
 app.secret_key = 'malipress_secret_key_2024'
 
 def get_db_connection():
@@ -102,4 +102,5 @@ def logout():
 # LE BLOC CI-DESSOUS DOIT ÊTRE COLLÉ AU BORD GAUCHE (0 ESPACE)
 if __name__ == '__main__':
 app.run(debug=True)
+
 
